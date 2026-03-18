@@ -413,38 +413,8 @@
             <div class="step-dot" id="step4">4</div>
         </div>
         
-        <!-- 基本信息 -->
-        <div class="form-section" id="section1">
-            <h2 class="section-title">基本信息</h2>
-            
-            <div class="form-group">
-                <label>受送达人姓名<span class="required">*</span></label>
-                <input type="text" id="name" placeholder="请输入姓名">
-            </div>
-            
-            <div class="form-group">
-                <label>身份证号<span class="required">*</span></label>
-                <input type="text" id="idCard" placeholder="请输入身份证号">
-            </div>
-            
-            <div class="form-group">
-                <label>联系电话<span class="required">*</span></label>
-                <input type="tel" id="phone" placeholder="请输入联系电话">
-            </div>
-            
-            <div class="form-group">
-                <label>送达地址<span class="required">*</span></label>
-                <textarea id="address" rows="3" placeholder="请输入详细送达地址"></textarea>
-            </div>
-            
-            <div class="navigation">
-                <div></div>
-                <button class="btn btn-primary" onclick="nextSection(1)">下一步</button>
-            </div>
-        </div>
-        
         <!-- 送达方式 -->
-        <div class="form-section hidden" id="section2">
+        <div class="form-section" id="section1">
             <h2 class="section-title">送达方式选择</h2>
             
             <div class="form-group">
@@ -459,23 +429,40 @@
                         <span>电子送达</span>
                     </label>
                     <label class="radio-item">
-                        <input type="radio" name="deliveryMethod" value="邮寄送达">
-                        <span>邮寄送达</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="deliveryMethod" value="委托送达">
-                        <span>委托送达</span>
-                    </label>
-                    <label class="radio-item">
-                        <input type="radio" name="deliveryMethod" value="留置送达">
-                        <span>留置送达</span>
+                        <input type="radio" name="deliveryMethod" value="其他">
+                        <span>其他</span>
                     </label>
                 </div>
             </div>
             
-            <div class="form-group hidden" id="emailGroup">
-                <label>电子邮箱<span class="required">*</span></label>
-                <input type="text" id="email" placeholder="请输入电子邮箱地址">
+            <div class="form-group hidden" id="otherDeliveryGroup">
+                <label>请输入其他送达方式<span class="required">*</span></label>
+                <input type="text" id="otherDelivery" placeholder="请输入送达方式">
+            </div>
+            
+            <div class="navigation">
+                <div></div>
+                <button class="btn btn-primary" onclick="nextSection(1)">下一步</button>
+            </div>
+        </div>
+        
+        <!-- 基本信息 -->
+        <div class="form-section hidden" id="section2">
+            <h2 class="section-title">基本信息</h2>
+            
+            <div class="form-group">
+                <label>受送达人姓名<span class="required">*</span></label>
+                <input type="text" id="name" placeholder="请输入姓名">
+            </div>
+            
+            <div class="form-group">
+                <label>联系电话<span class="required">*</span></label>
+                <input type="tel" id="phone" placeholder="请输入联系电话">
+            </div>
+            
+            <div class="form-group">
+                <label>送达地址<span class="required">*</span></label>
+                <textarea id="address" rows="3" placeholder="请输入详细送达地址"></textarea>
             </div>
             
             <div class="navigation">
@@ -550,10 +537,6 @@
                     </div>
                     
                     <div class="doc-line">
-                        身份证号：<span class="underline" id="docIdCard"></span>
-                    </div>
-                    
-                    <div class="doc-line">
                         联系电话：<span class="underline" id="docPhone"></span>
                     </div>
                     
@@ -562,12 +545,11 @@
                     </div>
                     
                     <div class="doc-line" style="margin-top: 20pt;">
-                        送达方式：
-                        <span id="docDeliveryMethod"></span>
+                        送达方式：<span id="docDeliveryMethod"></span>
                     </div>
                     
-                    <div class="doc-line" id="docEmailLine" style="display: none;">
-                        电子邮箱：<span class="underline" id="docEmail"></span>
+                    <div class="doc-line" style="margin-top: 10pt;">
+                        送达地址：<span class="underline-full" id="docDeliveryAddress"></span>
                     </div>
                     
                     <div class="doc-line" style="margin-top: 20pt; text-indent: 2em;">
@@ -644,15 +626,15 @@
                 console.error('Canvas element not found');
             }
             
-            // 电子送达邮箱显示逻辑
+            // 其他送达方式显示逻辑
             var radios = document.querySelectorAll('input[name="deliveryMethod"]');
             for (var i = 0; i < radios.length; i++) {
                 radios[i].addEventListener('change', function() {
-                    var emailGroup = document.getElementById('emailGroup');
-                    if (this.value === '电子送达') {
-                        emailGroup.classList.remove('hidden');
+                    var otherGroup = document.getElementById('otherDeliveryGroup');
+                    if (this.value === '其他') {
+                        otherGroup.classList.remove('hidden');
                     } else {
-                        emailGroup.classList.add('hidden');
+                        otherGroup.classList.add('hidden');
                     }
                 });
             }
@@ -784,13 +766,24 @@
         }
         
         function getFormData() {
+            var deliveryMethod = getRadioValue('deliveryMethod');
+            var deliveryAddress = '';
+            
+            if (deliveryMethod === '直接送达') {
+                deliveryAddress = '武汉港区海事处处罚室';
+            } else if (deliveryMethod === '电子送达') {
+                deliveryAddress = '海事通';
+            } else if (deliveryMethod === '其他') {
+                deliveryAddress = document.getElementById('otherDelivery').value;
+            }
+            
             return {
                 name: document.getElementById('name').value,
-                idCard: document.getElementById('idCard').value,
                 phone: document.getElementById('phone').value,
                 address: document.getElementById('address').value,
-                deliveryMethod: getRadioValue('deliveryMethod'),
-                email: document.getElementById('email').value,
+                deliveryMethod: deliveryMethod,
+                deliveryAddress: deliveryAddress,
+                otherDelivery: document.getElementById('otherDelivery').value,
                 confirmed: getRadioValue('confirmed')
             };
         }
@@ -799,13 +792,13 @@
             const formData = getFormData();
             
             // 验证必填字段
-            if (!formData.name || !formData.idCard || !formData.phone || !formData.address || !formData.deliveryMethod || !formData.confirmed) {
+            if (!formData.name || !formData.phone || !formData.address || !formData.deliveryMethod || !formData.confirmed) {
                 alert('请填写所有必填项！');
                 return;
             }
             
-            if (formData.deliveryMethod === '电子送达' && !formData.email) {
-                alert('请填写电子邮箱！');
+            if (formData.deliveryMethod === '其他' && !formData.otherDelivery) {
+                alert('请填写其他送达方式！');
                 return;
             }
             
@@ -819,17 +812,10 @@
             
             // 填充文书内容
             document.getElementById('docName').textContent = formData.name;
-            document.getElementById('docIdCard').textContent = formData.idCard;
             document.getElementById('docPhone').textContent = formData.phone;
             document.getElementById('docAddress').textContent = formData.address;
             document.getElementById('docDeliveryMethod').textContent = formData.deliveryMethod;
-            
-            if (formData.deliveryMethod === '电子送达') {
-                document.getElementById('docEmailLine').style.display = 'block';
-                document.getElementById('docEmail').textContent = formData.email;
-            } else {
-                document.getElementById('docEmailLine').style.display = 'none';
-            }
+            document.getElementById('docDeliveryAddress').textContent = formData.deliveryAddress;
             
             // 添加签名
             const signatureDiv = document.getElementById('docSignature');
@@ -855,14 +841,10 @@
             
             let text = '送达地址确认书\n\n';
             text += '受送达人：' + formData.name + '\n';
-            text += '身份证号：' + formData.idCard + '\n';
             text += '联系电话：' + formData.phone + '\n';
             text += '送达地址：' + formData.address + '\n';
             text += '送达方式：' + formData.deliveryMethod + '\n';
-            
-            if (formData.deliveryMethod === '电子送达') {
-                text += '电子邮箱：' + formData.email + '\n';
-            }
+            text += '送达地址：' + formData.deliveryAddress + '\n';
             
             text += '\n请确认一下当事人的送达地址，送达地址、收件人、联系方式若有变更应当书面形式告知海事管理机构。受送达人拒不提供地址的，经告知后仍不提供的，自然人以其户籍登记中的住所地或者经常居住地为送达地址；法人或者其他组织以其工商登记或者其他依法登记、备案中的住所地为确认的送达地址适用于办理行政执法各个阶段，直至有关事项办理完毕。如您提供的送达地址不准确、送达地址等变更未及时告知海事管理机构、受送达人本人或者受送达人的委托代理人、指定代收人拒绝签收，导致海事行政执法文书未能被受送达人实际接收的，文书退回之日视为送达之日。\n\n';
             text += '日期：' + dateStr;
